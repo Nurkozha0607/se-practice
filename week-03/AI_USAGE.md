@@ -1,27 +1,23 @@
 # AI Usage Disclosure — Week 03
 
-Required by the course academic policy (Generative AI use level **D** — AI-integrated).
-AI use is expected in this lab. You remain responsible for the accuracy, testing and integrity of
-everything you submit, including everything an AI tool produced.
+Required by the course academic policy (Generative AI use level **D — AI-integrated**).
+
+AI was used to generate requirements and assist with their review. The generated content was compared with the Smart Campus scenario, including its two actors, six use cases, four business rules, and out-of-scope exclusions.
 
 | Tool | Exact model + version | Used for | Which files it touched |
 | --- | --- | --- | --- |
-| TODO | TODO | Prompt 1 — user stories | `requirements/user-stories.md` |
-| | | Prompt 2 — acceptance criteria | `requirements/acceptance-criteria.md` |
-| | | Prompt 3 — use-case diagram | `requirements/use-cases.puml` |
+| ChatGPT | GPT-6 | Prompt 1 — generating the initial user stories | `requirements/user-stories.md`, `lab-report.md` |
+| ChatGPT | GPT-6 | Prompt 2 — generating the initial acceptance criteria | `requirements/acceptance-criteria.md`, `lab-report.md` |
+| ChatGPT | GPT-6 | Prompt 3 — generating the PlantUML use-case diagram | `requirements/use-cases.puml`, `lab-report.md` |
+| ChatGPT | GPT-6 | Reviewing requirements, proposing revisions, documenting findings and traceability, drafting the report, and preparing the submission declaration | `requirements/`, `lab-report.md`, `submission.yml`, `AI_USAGE.md` |
 
-**One tool and one model for all three prompts:** yes / no
-<!-- If "no", say which prompt used what. -->
+**One tool and one model for all three prompts:** Yes — ChatGPT, GPT-6.
 
-**Did you use AI for anything beyond the three verbatim prompts** — rewriting your review, writing
-the traceability table, drafting the conclusion? Name it. This is allowed and disclosed, not hidden.
+**Did you use AI for anything beyond the three verbatim prompts?** Yes. ChatGPT helped identify out-of-scope requirements, revise the user stories and acceptance criteria, review the UML associations, build the traceability table, and draft the lab report and submission files. These additional uses are disclosed above.
 
-<!-- answer here -->
+**Everything I submitted, I can explain and defend in class:** Not independently verified. The final submission remains my responsibility.
 
-**Everything I submitted, I can explain and defend in class:** yes / no
+**Anything I accepted from the AI without fully understanding it:** AI assistance was used for the requirements review, the PlantUML `<<include>>` relationships, the traceability mappings, and the submission documentation. I have not independently verified every aspect of these generated artifacts.
 
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the file and the part. An honest answer costs nothing. -->
-
-Signed:
-Date:
+**Signed:** Nurkozha  
+**Date:** 11 October 2026
