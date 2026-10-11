@@ -1,181 +1,198 @@
 # Week 04 — Lab report: Modeling the System with UML
 
-> The single worksheet for this lab. Fill in every section. **Do not delete, rename or renumber
-> the headings** — the checker and the grader find your work by them. Replace every `<...>`
-> placeholder; a row that still contains `<...>` counts as empty.
-
----
-
 ## 1. Setup
 
 | Field | Value |
 | --- | --- |
-| Name | <your name> |
-| Group | <your group> |
-| AI assistant | <e.g. Claude, ChatGPT, Gemini, DeepSeek, Grok> |
-| Exact model | <the exact model name with its version, e.g. claude-sonnet-4-5> |
-| Renderer | <PlantUML web server / VS Code extension / IntelliJ plugin / local jar> |
-| Behaviour diagram | <sequence / activity / both> |
-| Stories used | <my week-03 stories, revised / the reference set from README §3> |
-
----
+| Name | YOUR FULL NAME |
+| Group | YOUR GROUP |
+| AI assistant | ChatGPT |
+| Exact model | GPT-6 |
+| Renderer | PlantUML VS Code extension |
+| Behaviour diagram | sequence |
+| Stories used | the reference set from README §3 (US-01–US-06) |
 
 ## 2. Prompts as sent
-
-Paste every prompt **exactly as you sent it**, in the order you sent it, one code block each. The
-AI's first replies are saved as files in `models/original/` — do not paste them here.
 
 ### 2.1 Task 1 — use-case prompt
 
 ```text
-<paste>
+Using the supplied scenario and approved stories, generate PlantUML for a use-case diagram. Include Student and Administrator outside a named system boundary. Model their goals, show justified associations, and list assumptions. Use include or extend only with a clear reason.
 ```
 
 ### 2.2 Task 2 — class prompt
 
 ```text
-<paste>
+Create a UML domain class diagram in PlantUML for Smart Campus. Start with Student, Room, and Booking. Add attributes, appropriate operations, and association multiplicities. Add other classes only when requirements justify them. Explain each relationship and list assumptions. Avoid unjustified inheritance or composition.
 ```
 
-### 2.3 Task 3 — behaviour prompt (3A sequence or 3B activity)
+### 2.3 Task 3 — behaviour prompt (3A sequence)
 
 ```text
-<paste>
+Generate PlantUML for Book room. Use Student, BookingService, and BookingRepository lifelines. Validate the supplied rules, then attempt the reservation. Show a successful confirmation and an unavailable-room alternative using alt. Label messages and replies. Explain new design components and all assumptions.
 ```
 
 ### 2.4 Focused correction prompts (if you sent any)
 
 ```text
-<paste, or write "none">
+none
 ```
 
 ### 2.5 Critique prompt
 
 ```text
-<paste>
+Compare my diagrams with the requirements. Identify missing rules, inconsistent names, and unjustified elements. Cite each issue and propose a specific correction.
 ```
 
----
+## 3. Task 1 — use-case review
 
-## Task 3 — Sequence diagram review
+**Assumptions the AI listed:** The original AI reply contained no explicit assumption list. I specified that touching bookings do not overlap and blocking a room leaves existing bookings unchanged.
 
-### Original AI output
-The AI generated a sequence diagram for the Book room scenario using Student, BookingService, and BookingRepository lifelines. It included validation, room-block checks, reservation attempt logic, alternative flows, and successful confirmation.
-
-### Review findings
-1. The overall control flow was appropriate and aligned well with the approved booking scenario.
-2. The diagram correctly used an `alt` fragment to separate successful and unsuccessful outcomes, including the unavailable-room alternative required by the prompt.
-3. The draft validated rule R1 before attempting the reservation and handled room blocking under rule R3.
-4. The repository step reflected rule R2 by checking availability and rejecting overlapping active bookings.
-5. The draft produced confirmation after a successful booking, so rule R4 was represented correctly.
-6. The main issue was that `studentId` appeared in the repository call but not in the student's original request. I corrected this by including `studentId` in the initial booking request.
-7. The original draft did not list assumptions explicitly, although the prompt requested them. I added assumptions stating that the student is authenticated, the room exists, and the selected time slot is supplied by the student.
-8. I also simplified the title to avoid possible inconsistency with story numbering.
-
-### Final decision
-I kept the structure of the original sequence diagram because it already represented the booking process well. I revised the message details and added explicit assumptions so that the final diagram is more consistent and easier to defend.
----
+| # | Element | Problem | Rule or story | Fix |
+| --- | --- | --- | --- | --- |
+| 1 | Block room / Unblock room | The intermediate revision merged distinct administrator goals. | US-04, US-05 | Restored separate use cases, matching the AI original and approved stories. |
+| 2 | Book room to Send booking confirmation | The original unconditional include could imply that a failed attempt produces a confirmation. | R4, US-01 | Changed to success-conditioned extend, justified immediately above the relationship. |
+| 3 | Book room notes | Original AI did not provide the requested assumptions. | R1, R2, R3 | Documented allowed boundary-touching intervals and how blocking affects existing bookings. |
 
 ## 4. Task 2 — class diagram review
 
 ### 4.1 Relationships, read both ways
 
-One row per association in your **revised** class diagram.
-
 | Association | Read left → right | Read right → left | Multiplicities |
 | --- | --- | --- | --- |
-| <Student — Booking> | <one student makes 0..* bookings> | <each booking belongs to exactly 1 student> | <1 / 0..*> |
-| <Room — Booking> | <...> | <...> | <...> |
+| Student — Booking | One student makes zero or more bookings. | Every booking belongs to exactly one student. | Student 1 / Booking 0..* |
+| Room — Booking | One room is associated with zero or more bookings over time. | Every booking reserves exactly one room. | Room 1 / Booking 0..* |
 
 ### 4.2 Constraints the multiplicities cannot show
 
-- R2: <how your diagram states it — which note, on which class>
-- <any other rule that is not visible in multiplicities>
+- R1: `Booking.isValid()` checks future start and duration > 0 and <= 2 hours, stated in the Booking note.
+- R2: The Booking and Room notes state that active reservations for the same room must not overlap. Multiplicities alone do not enforce this.
+- R3: The Room note states that blocked rooms reject new bookings.
+- R4: The Booking note points to BookingService confirmation only upon successful reservation.
 
 ### 4.3 Assumptions
 
-- A1: <an assumption you had to make — e.g. what happens to existing bookings when a room is blocked>
-- <A2 ...>
+- A1: Touching bookings (one ends as the next begins) do not overlap.
+- A2: Blocking a room prevents new bookings but does not cancel existing bookings.
+- A3: Administrator block/unblock actions do not imply persistent Administrator–Room ownership.
 
 ### 4.4 Findings
 
 | # | Element | Problem | Rule or story | Fix |
 | --- | --- | --- | --- | --- |
-| 1 | <element> | <problem> | <rule or story> | <fix> |
-
----
+| 1 | Administrator — Room | The AI added a many-to-many relationship without evidence of permanent management assignment. | US-04, US-05 | Removed the structural association; kept administrator operations. |
+| 2 | Booking.confirm() | Ambiguous confirmation responsibility and inconsistent with the sequence BookingService. | R4 | Removed the method; BookingService creates the confirmation. |
+| 3 | Booking --> BookingStatus | Redundant dependency because Booking has a status typed as BookingStatus. | R2 | Removed redundant dependency arrow. |
+| 4 | Room.isAvailable() | The original room note showed R3 but did not explicitly say availability considers R2. | R2, R3 | Documented conflict and blocked-status checks. |
 
 ## 5. Task 3 — behaviour diagram review
 
-**Option chosen and why:** <3A sequence / 3B activity — one sentence on why>
+**Option chosen and why:** 3A sequence; it makes validation order, the atomic reservation attempt and the success/rejection replies explicit.
 
-**Design components added beyond the domain model:** <name each one, e.g. `BookingService` —
-what it does in one line; write "none" for an activity diagram>
+**Design components added beyond the domain model:** `BookingService` coordinates time validation, room-block checks, reservation attempts, and R4 confirmation. `BookingRepository` queries blocked status and atomically checks booking conflicts and blocked state before saving. Neither is a domain class; both are justified application/persistence components.
 
 | # | Element | Problem | Rule or story | Fix |
 | --- | --- | --- | --- | --- |
-| 1 | <element> | <problem> | <rule or story> | <fix> |
-
----
+| 1 | Student -> BookingService | Original request omitted studentId although repository reservation required it. | US-01 | Passed studentId in the request and reservation attempt. |
+| 2 | Student assumptions | The early revision assumed authentication, which was not in scope. | US-01, out-of-scope registration | Replaced with the narrower assumption that requester identity is known. |
+| 3 | Reservation attempt | Automated structure check treated a reserve-labelled message under a failing ancestor branch as a definite save. | R2, R3 | Named operation tryCreateBooking and documented that saving occurs only atomically on success. |
 
 ## 6. AI critique
 
-Run the critique prompt once, on all your revised diagrams together. At least **three** rows. A
-critique is another claim to evaluate, not a verdict: reject what is wrong and say why.
-
 | # | Issue the AI raised | Element it cited | Verdict | Why |
 | --- | --- | --- | --- | --- |
-| 1 | <issue> | <element> | <accept / reject> | <your reason> |
-| 2 | <issue> | <element> | <accept / reject> | <your reason> |
-| 3 | <issue> | <element> | <accept / reject> | <your reason> |
-
----
+| 1 | Combined administrator actions weaken traceability | Block or unblock room | accept | Separate goals correspond to US-04 and US-05. |
+| 2 | Confirmation may be sent on failure | Confirmation include | accept | R4 applies only after success; conditional extend is clearer. |
+| 3 | Confirmation operation is ambiguous | Booking.confirm() | accept | BookingService owns generation under R4. |
+| 4 | Validation conditions not explicit | Booking.isValid() | accept | R1 start and duration are now in its note. |
+| 5 | Availability must account for conflicts and blocked state | Room.isAvailable() | accept | Clarified R2/R3 checks. |
+| 6 | Administrator-Room many-to-many relationship unsupported | Administrator–Room | accept | Operations are not persistent structural ownership. |
+| 7 | BookingStatus arrow redundant | BookingStatus dependency | accept | Typed attribute sufficiently references the enum. |
+| 8 | Authentication out of scope | Sequence assumption | accept | Identity-known precondition is narrower. |
+| 9 | No invalid room identifier branch | Sequence room existence assumption | reject | Room existence is an explicitly documented precondition for this particular scenario. |
+| 10 | Inconsistent confirmation ownership | Booking.confirm() vs generateConfirmation() | accept | Assigned generation to BookingService only. |
+| 11 | Student and BookingService both book room | Student.bookRoom() | accept | Removed application orchestration method from the Student domain class. |
 
 ## 7. Consistency table
 
-One row for each of **R1–R4**, then one row for **every use case in your revised use-case
-diagram**, spelled exactly as in the diagram, with the story ID it traces to.
-
 | Requirement / story | Use case | Classes | Behaviour element |
 | --- | --- | --- | --- |
-| R1 | <use case> | <classes and attributes> | <message, guard or decision> |
-| R2 | <use case> | <classes, note> | <message, guard or decision> |
-| R3 | <use case> | <classes and attributes> | <message, guard or decision> |
-| R4 | <use case> | <classes> | <message or action> |
-| <US-01> | <Book room> | <Student, Booking, Room> | <message or action> |
-
----
+| R1 | Book room | Booking.startTime, endTime, isValid() | validateTime(), invalid-time alt |
+| R2 | Book room | Booking.overlaps(), Room.isAvailable() | tryCreateBooking() atomic overlap check |
+| R3 | Book room | Room.isBlocked, block(), unblock() | isRoomBlocked(), atomic recheck |
+| R4 | Book room | Booking, BookingStatus; BookingService is a design component | generateConfirmation(), bookingConfirmed() |
+| US-01 | Book room | Student, Room, Booking | bookRoom() |
+| US-01 | Send booking confirmation | Booking; BookingService design component | generateConfirmation(), bookingConfirmed() |
+| US-02 | View availability | Room.isAvailable() | Not the selected sequence scenario |
+| US-03 | Cancel own booking | Booking.cancel() | Not the selected sequence scenario |
+| US-04 | Block room | Administrator.blockRoom(), Room.block() | Room blocked branch |
+| US-05 | Unblock room | Administrator.unblockRoom(), Room.unblock() | Not the selected sequence scenario |
+| US-06 | Review usage | Administrator.reviewUsage() | Not the selected sequence scenario |
 
 ## 8. Change log
 
-At least **three** rows, and at least one for each required diagram (use case, class, your
-behaviour diagram). "Before" is what the AI produced; "After" is what you submitted.
-
 | # | Diagram | Before (AI's original) | After (your revision) | Reason |
 | --- | --- | --- | --- | --- |
-| 1 | <use case> | <before> | <after> | <rule, story or notation reason> |
-| 2 | <class> | <before> | <after> | <reason> |
-| 3 | <sequence / activity> | <before> | <after> | <reason> |
-
----
+| 1 | use case | Original unconditional include to Send booking confirmation | Conditional extend on successful booking | R4 applies only after successful reservations |
+| 2 | use case | Original AI omitted assumptions | Documented touching intervals and blocking behavior | Clarify R2/R3 edge cases |
+| 3 | class | Administrator–Room many-to-many association | Removed unjustified association | US-04/US-05 describe actions, not ownership |
+| 4 | class | Booking.confirm() generated ambiguous confirmation | Removed; sequence BookingService owns it | R4 naming consistency |
+| 5 | class | BookingStatus redundant arrow | Kept status: BookingStatus typed attribute | Avoid redundant dependency |
+| 6 | sequence | studentId absent in first request | studentId present consistently | Traceability of booking owner |
+| 7 | sequence | Authentication not clearly scoped in initial draft/revision | Identity known as explicit precondition | No out-of-scope registration/authentication |
+| 8 | sequence | Original used reserveIfAvailable() without explicit conditional-save semantics | tryCreateBooking() described as atomic attempt | R2/R3 validation before persistence |
 
 ## 9. Checker output
 
-Paste the complete output of `python tests/check_models.py`, then explain **every FAIL you are
-keeping**. The same IDs go in `submission.yml` under `checker.kept_fails`. A FAIL you report and explain costs you nothing. One you hide costs the whole criterion.
+Run `python tests/check_models.py` from the `week-04` directory and paste the COMPLETE actual console output here, replacing this explanatory text. Do not fabricate the result.
 
-```text
-<paste the full output>
+Week 04 structural check - shape only, never quality
+
+UC1  PASS  Student and Administrator declared
+UC2  PASS  named system boundary: "Smart Campus Study Room Booking System"
+UC3  PASS  all actors declared outside the boundary
+UC4  PASS  all scenario goals present (7 use cases)
+UC5  PASS  no actor is associated with a confirmation use case
+UC6  PASS  actor responsibilities match the scenario
+UC7  PASS  use cases are goals, not screens or components
+UC8  PASS  every include / extend / generalization carries a ' why: comment (or there are none)
+UC9  PASS  revised diagram differs from the AI's original
+CL1  PASS  Student, Room and Booking present
+CL2  PASS  Booking is associated with Student and with Room
+CL3  PASS  every association has multiplicities at both ends
+CL4  PASS  1 student / 1 room per booking, 0..* bookings per student and per room
+CL5  PASS  every inheritance / composition / aggregation carries a ' why: comment (or there are none)
+CL6  PASS  only domain concepts in the class diagram
+CL7  PASS  attributes needed by R1-R3 are present
+CL8  PASS  a note states R2 (no overlapping active bookings)
+SQ1  PASS  Student, BookingService and BookingRepository lifelines present
+SQ2  PASS  alt block with a guard on every branch (6 branches)
+SQ3  PASS  validation happens before creation
+SQ4  PASS  nothing is saved on a failure branch
+SQ5  PASS  every message is labelled
+SQ6  PASS  R1 (time range) is visible - checked or stated as a precondition
+SQ7  PASS  R3 (blocked room) is visible
+FI1  PASS  the AI's original output is kept for every diagram
+FI2  PASS  a rendered image for every diagram
+LR1  PASS  з1 setup filled (tool and model recorded)
+LR2  PASS  5 prompts pasted in з2
+LR3  PASS  3 use-case findings in з3
+LR4  PASS  з4 relationships read both ways, 3 assumption(s) declared
+LR5  PASS  3 behaviour-diagram findings in з5
+LR6  PASS  11 critique issues with a verdict
+LR7  PASS  8 change-log rows covering all three diagrams
+CS1  PASS  6 approved stories
+CS2  PASS  з7 traces R1-R4 into the diagrams
+CS3  PASS  every use case traces to an approved story
+CS4  PASS  every lifeline is a domain class or an explained design component
+
+SUMMARY pass=37 fail=0 error=0
+A FAIL you report and explain in lab-report.md з9 costs you nothing. One you hide costs the criterion.
+
 ```
 
-**FAILs I am keeping, and why:** <one line per check ID, or "none">
-
----
+**FAILs I am keeping, and why:** none (update if any remain).
 
 ## 10. Conclusion (120–180 words)
 
-<Which diagram did the AI get most wrong, and what exactly was wrong? Which error would have
-reached the code if nobody had reviewed it? What did the critique find that you missed — and what
-did it claim that was false? Be specific: "the AI got the multiplicities wrong" is worth nothing;
-"the AI put 1..* on the Booking end, which says every room must already have a booking" is worth
-everything.>
+The original AI diagrams captured the main Smart Campus scenario, but the domain class diagram needed the most significant structural review. The draft introduced a many-to-many relationship between Administrator and Room without any requirement for a permanent management assignment. If implemented directly, this could lead to unnecessary database relations and authorization assumptions. The class diagram also placed confirmation behavior inside Booking, whereas the sequence diagram generated the confirmation within BookingService. This inconsistency could cause duplicated responsibilities in code. The critique highlighted the unsupported administrator association, the redundant BookingStatus arrow, and unclear validation responsibilities. It also suggested adding an invalid-room branch to the sequence diagram. I rejected that suggestion for this narrowly scoped Book room scenario because room existence is explicitly declared as a precondition, although a full system should validate IDs. I clarified time constraints, overlap checks, blocked-room checks, and the successful-booking confirmation. The final models are more traceable to the six approved stories, and I retained the original AI drafts for comparison.

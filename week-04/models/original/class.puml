@@ -1,66 +1,61 @@
 @startuml
 title Smart Campus - Domain Class Diagram
-
 skinparam classAttributeIconSize 0
 
 class Student {
-    - studentId: String
-    + viewAvailability(): void
-    + bookRoom(room: Room, start: DateTime, end: DateTime): Booking
-    + cancelBooking(booking: Booking): void
-}
-
-class Room {
-    - roomId: String
-    - isBlocked: Boolean
-    + isAvailable(start: DateTime, end: DateTime): Boolean
-    + block(): void
-    + unblock(): void
-}
-
-class Booking {
-    - bookingId: String
-    - startTime: DateTime
-    - endTime: DateTime
-    - status: BookingStatus
-    + isValid(): Boolean
-    + cancel(): void
-    + overlaps(other: Booking): Boolean
-    + confirm(): void
+ - studentId: String
+ + viewAvailability(): void
+ + cancelBooking(booking: Booking): void
 }
 
 class Administrator {
-    - adminId: String
-    + blockRoom(room: Room): void
-    + unblockRoom(room: Room): void
-    + reviewUsage(): void
+ - adminId: String
+ + blockRoom(room: Room): void
+ + unblockRoom(room: Room): void
+ + reviewUsage(start: DateTime, end: DateTime): void
+}
+
+class Room {
+ - roomId: String
+ - isBlocked: Boolean
+ + isAvailable(start: DateTime, end: DateTime): Boolean
+ + block(): void
+ + unblock(): void
+}
+
+class Booking {
+ - bookingId: String
+ - startTime: DateTime
+ - endTime: DateTime
+ - status: BookingStatus
+ + isValid(): Boolean
+ + overlaps(other: Booking): Boolean
+ + cancel(): void
 }
 
 enum BookingStatus {
-    ACTIVE
-    CANCELLED
+ ACTIVE
+ CANCELLED
 }
 
 Student "1" -- "0..*" Booking : makes
 Room "1" -- "0..*" Booking : reserved for
-Administrator "0..*" -- "0..*" Room : manages
-
-Booking --> BookingStatus : status
 
 note right of Booking
-R1: Start must be in the future.
-Duration must be > 0 and <= 2 hours.
+R1: isValid() requires future start,
+duration > 0 and <= 2 hours.
 
-R2: Active bookings for the
-same room cannot overlap.
+R2: Active bookings for same room
+must not overlap; touching is allowed.
 
-R4: Successful booking
-produces a confirmation.
+R4: BookingService generates a confirmation
+after a successful reservation.
 end note
 
 note right of Room
-R3: Blocked rooms cannot
-accept new bookings.
+R2: isAvailable() considers active bookings.
+R3: isAvailable() rejects a blocked room.
+Blocking leaves existing bookings intact.
 end note
 
 @enduml

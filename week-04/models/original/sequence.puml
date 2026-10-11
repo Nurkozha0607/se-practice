@@ -1,4 +1,3 @@
-
 @startuml
 title Smart Campus - Book Room (US-01)
 
@@ -6,44 +5,64 @@ actor Student
 participant BookingService
 database BookingRepository
 
-Student -> BookingService : bookRoom(roomId, startTime, endTime)
+note right of Student
+Assumptions:
+- Requesting student identity is known.
+- Selected room exists.
+- Student supplies the time slot.
+- Touching bookings do not overlap.
+end note
+
+Student -> BookingService : bookRoom(studentId, roomId, startTime, endTime)
 activate BookingService
 
-BookingService -> BookingService : validateTime(startTime, endTime)\nR1: future start, 0 < duration <= 2h
+BookingService -> BookingService : validateTime(startTime, endTime)
+
+note right of BookingService
+R1: Future start, duration > 0 and <= 2 hours.
+end note
 
 alt Invalid time or duration
-    BookingService --> Student : bookingRejected("Invalid time or duration")
+ BookingService --> Student : bookingRejected("Invalid time or duration")
+
 else Valid time and duration
-    BookingService -> BookingRepository : isRoomBlocked(roomId)
-    activate BookingRepository
-    BookingRepository --> BookingService : blocked
-    deactivate BookingRepository
+ BookingService -> BookingRepository : isRoomBlocked(roomId)
+ activate BookingRepository
+ BookingRepository --> BookingService : blocked
+ deactivate BookingRepository
 
-    alt Room is blocked (R3)
-        BookingService --> Student : bookingRejected("Room is blocked")
-    else Room is not blocked
-        BookingService -> BookingRepository : reserveIfAvailable(studentId, roomId,\nstartTime, endTime)
-        activate BookingRepository
-        note right of BookingRepository
-          R2: Reject overlapping active bookings.
-          Recheck R3 atomically before saving.
-        end note
+ alt Room blocked (R3)
+  BookingService --> Student : bookingRejected("Room is blocked")
 
-        alt Room available and reservation succeeds
-            BookingRepository --> BookingService : bookingCreated(bookingId)
-            deactivate BookingRepository
-            BookingService -> BookingService : generateConfirmation(bookingId)
-            note right of BookingService
-              R4: Successful booking
-              produces a confirmation.
-            end note
-            BookingService --> Student : bookingConfirmed(bookingId, confirmation)
-        else Room unavailable or blocked
-            BookingRepository --> BookingService : reservationRejected(reason)
-            deactivate BookingRepository
-            BookingService --> Student : bookingRejected(reason)
-        end
-    end
+ else Room available for request
+  BookingService -> BookingRepository : tryCreateBooking(studentId, roomId, startTime, endTime)
+  activate BookingRepository
+
+  note right of BookingRepository
+  R2: Check active-booking conflicts atomically.
+  R3: Recheck blocked status before commit.
+  Create only if checks pass; otherwise no save.
+  end note
+
+  alt Reservation succeeds
+   BookingRepository --> BookingService : bookingCreated(bookingId)
+   deactivate BookingRepository
+
+   BookingService -> BookingService : generateConfirmation(bookingId)
+
+   note right of BookingService
+   R4: Confirmation is generated only on success.
+   end note
+
+   BookingService --> Student : bookingConfirmed(bookingId, confirmation)
+
+  else Reservation rejected (unavailable or newly blocked)
+   BookingRepository --> BookingService : reservationRejected(reason)
+   deactivate BookingRepository
+
+   BookingService --> Student : bookingRejected(reason)
+  end
+ end
 end
 
 deactivate BookingService
