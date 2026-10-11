@@ -57,18 +57,23 @@ AI's first replies are saved as files in `models/original/` — do not paste the
 
 ---
 
-## 3. Task 1 — use-case review
+## Task 3 — Sequence diagram review
 
-**Assumptions the AI listed:** <one line each, or "the AI listed none" — that is a finding too>
+### Original AI output
+The AI generated a sequence diagram for the Book room scenario using Student, BookingService, and BookingRepository lifelines. It included validation, room-block checks, reservation attempt logic, alternative flows, and successful confirmation.
 
-At least **two** findings. A finding names the element, the problem and the rule or story that
-proves it is a problem.
+### Review findings
+1. The overall control flow was appropriate and aligned well with the approved booking scenario.
+2. The diagram correctly used an `alt` fragment to separate successful and unsuccessful outcomes, including the unavailable-room alternative required by the prompt.
+3. The draft validated rule R1 before attempting the reservation and handled room blocking under rule R3.
+4. The repository step reflected rule R2 by checking availability and rejecting overlapping active bookings.
+5. The draft produced confirmation after a successful booking, so rule R4 was represented correctly.
+6. The main issue was that `studentId` appeared in the repository call but not in the student's original request. I corrected this by including `studentId` in the initial booking request.
+7. The original draft did not list assumptions explicitly, although the prompt requested them. I added assumptions stating that the student is authenticated, the room exists, and the selected time slot is supplied by the student.
+8. I also simplified the title to avoid possible inconsistency with story numbering.
 
-| # | Element | Problem | Rule or story | Fix |
-| --- | --- | --- | --- | --- |
-| 1 | <e.g. Student → Send confirmation> | <what is wrong> | <R4 / US-01 / scenario sentence> | <what you changed> |
-| 2 | <element> | <problem> | <rule or story> | <fix> |
-
+### Final decision
+I kept the structure of the original sequence diagram because it already represented the booking process well. I revised the message details and added explicit assumptions so that the final diagram is more consistent and easier to defend.
 ---
 
 ## 4. Task 2 — class diagram review

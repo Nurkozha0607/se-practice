@@ -1,0 +1,70 @@
+@startuml
+title Smart Campus - Book Room
+
+actor Student
+participant BookingService
+database BookingRepository
+
+note right of Student
+Assumptions:
+- the student is authenticated
+- the selected room exists
+- the selected time slot is provided by the student
+end note
+
+Student -> BookingService : bookRoom(studentId, roomId, startTime, endTime)
+activate BookingService
+
+BookingService -> BookingService : validateTime(startTime, endTime)
+note right of BookingService
+R1:
+- start time must be in the future
+- duration must be > 0 and <= 2 hours
+end note
+
+alt Invalid time or duration
+    BookingService --> Student : bookingRejected("Invalid time or duration")
+else Valid time and duration
+    BookingService -> BookingRepository : isRoomBlocked(roomId)
+    activate BookingRepository
+    BookingRepository --> BookingService : blocked
+    deactivate BookingRepository
+
+    alt Room is blocked
+        BookingService --> Student : bookingRejected("Room is blocked")
+    else Room is not blocked
+        BookingService -> BookingRepository : reserveIfAvailable(studentId, roomId, startTime, endTime)
+        activate BookingRepository
+
+        note right of BookingRepository
+        R2:
+        active bookings for the same room
+        must not overlap.
+
+        R3:
+        the room must still not be blocked
+        at the time of saving.
+        end note
+
+        alt Reservation succeeds
+            BookingRepository --> BookingService : bookingCreated(bookingId)
+            deactivate BookingRepository
+
+            BookingService -> BookingService : generateConfirmation(bookingId)
+            note right of BookingService
+            R4:
+            successful booking produces
+            a confirmation.
+            end note
+
+            BookingService --> Student : bookingConfirmed(bookingId, confirmation)
+        else Room unavailable or blocked
+            BookingRepository --> BookingService : reservationRejected(reason)
+            deactivate BookingRepository
+            BookingService --> Student : bookingRejected(reason)
+        end
+    end
+end
+
+deactivate BookingService
+@enduml
