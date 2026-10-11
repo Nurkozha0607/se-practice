@@ -339,45 +339,38 @@ RESULT  6 PASS · 0 FAIL · 0 ERROR   (week-02/code/prompt_d.py)
 ```
 ## 7. Scoring
 
-0–2 per criterion, using the rubric in `README.md` Part 7.
-
 | Criterion | A | B | C | D |
-| --- | --- | --- | --- | --- |
-| Correctness (cases passed) | | | | |
-| Requirement coverage | | | | |
-| Verifiability (tests) | | | | |
-| Assumptions stated | | | | |
-| Noise (2 = none) | | | | |
-| **Total / 10** | | | | |
+|---|---|---|---|---|
+| Correctness (cases passed) | 2 | 2 | 2 | 2 |
+| Requirement coverage | 2 | 2 | 2 | 2 |
+| Verifiability (tests) | 0 | 0 | 2 | 2 |
+| Assumptions stated | 0 | 1 | 2 | 2 |
+| Noise (2 = none) | 1 | 1 | 2 | 2 |
+| **Total / 10** | **5** | **6** | **10** | **10** |
 
-**Prompt length, in words:** A ____ · B ____ · C ____ · D ____
+**Prompt length, in words:** A 7 · B 55 · C 96 · D approximately 180
 
-**Words added per point gained** — B over A, C over B, D over C. One line on what that ratio says:
+**Words added per point gained:**
 
----
+B improved the score by 1 point compared with A, while C improved it by 4 points compared with B. D achieved the same score as C despite requiring more words. This suggests that examples and executable tests contributed more value than additional requirements once the basic implementation was already correct.
 
 ## 8. Conclusion — 150–200 words
 
-Answer in this order: (1) which prompt scored best, and whether it is the one you would actually
-use at work; (2) which single addition bought the most correctness, naming the exact case that
-changed verdict; (3) what was pure noise; (4) the ambiguity and your resolution.
+In this experiment, I tested four different prompts using ChatGPT GPT-6 and Python. All four generated implementations passed the six official test cases. However, their quality differed in terms of requirements, testing, and clarity.
 
-Name test cases and real returned values. "More detailed prompts work better" scores zero.
+Prompts C and D received the highest scores because they included examples, validation requirements, and additional tests. I would choose Prompt D for professional development because it clearly defines input validation, output structure, passing conditions, and rounding behavior.
 
-```
-(150–200 words)
+The most useful addition was the worked example and explicit rounding requirement. In case 1, Prompts A and B returned a pass rate of 66.66666666666666, while Prompts C and D returned 66.67. Although all four passed the official test because of its tolerance, the last two produced a more predictable result.
 
+Some additional explanations and repeated requirements added unnecessary length without improving test outcomes. Prompt D was more detailed than C but did not achieve a higher test score.
 
+The main ambiguity concerned rounding. The specification provided 66.67 as an example but did not clearly require rounding. In Prompt D, I explicitly required the pass rate to be rounded to two decimal places.
 
-```
+This experiment showed that precise prompts improve predictability and verifiability, even when simpler prompts already produce correct code.
 
-**Word count:**
-
----
+**Word count:** 188
 
 ## 9. Two questions for the debrief
 
-Written before class, answered in class.
-
-1.
-2.
+1. Why can a minimal prompt produce the same number of passing tests as a detailed prompt?
+2. How can developers choose the right level of detail for an AI coding prompt?
