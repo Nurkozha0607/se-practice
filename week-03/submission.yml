@@ -14,7 +14,7 @@ checker:
   pass: 23
   fail: 0
   error: 0
-  commit: REPLACE_WITH_COMMIT_SHA
+  commit: d7dc73d
 assumptions:
   overlap_touching_bookings: allowed
   exactly_two_hours: allowed
