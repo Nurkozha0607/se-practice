@@ -1,25 +1,19 @@
 # AI Usage Disclosure — SIS #01
 
-Required by the course academic policy (Generative AI use level **D** — AI-integrated, and for this
-assignment AI use is **required** in the working process). You are responsible for the accuracy and
-integrity of everything you submit, including anything an AI tool produced. The complete exchanges
-live in `report.md`, section 8 — this file is the summary, not a second copy.
-
-| Tool | Exact model / plan | Used for | Which sections it touched |
+| Tool | Exact model | Used for | Files / sections |
 | --- | --- | --- | --- |
-| | | | |
+| ChatGPT | GPT-6 | Scenario, initial outline suggestions, analysis, critique, revision, complete report and reflection drafting | `report.md` §§1–9 |
+| ChatGPT | GPT-6 | Preparing and checking submission files | `AI_USAGE.md`, `submission.yml` |
 
-**Two parts of this assignment are yours alone. Both were written without AI assistance:** yes / no
-<!-- The initial outline (report.md section 7, written BEFORE Prompt A) and the reflection
-     (section 5). If "no", say exactly what was assisted. An honest "no" costs far less than an
-     undisclosed "yes". -->
+**Were the five points in Appendix A written independently by the student before Prompt A?** No. They were AI-assisted and the initial Git commit does not establish otherwise.
 
-**Every source in section 6 is one I opened and read myself:** yes / no
+**Was the reflection written entirely by the student without AI?** No. AI supplied a draft; the student must revise it personally to satisfy the assignment's authorship requirement.
 
-**Everything I submitted, I can explain and defend without consulting the assistant:** yes / no
+**Were the cited sources opened and verified personally by the student?** No confirmation. The assistant inspected supplied course materials. External PostgreSQL references were not verified and are not claimed as verified in the report.
 
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the section and the sentence. "Nothing" is a valid answer only if it is true. -->
+**Are the three AI exchanges included?** Yes; Prompt A, Prompt B and Prompt C responses are included. The recorded prompts should be checked against messages actually sent before submission.
 
-Signed: <your name>
-Date:
+**Responsibility:** The student should read, correct, and confirm the report and disclosure before submission.
+
+Signed: Nurkozha (confirm full registered name)  
+Date: 2026-10-12
