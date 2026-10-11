@@ -1,0 +1,64 @@
+@startuml
+title Smart Campus - Revised Domain Class Diagram
+
+skinparam classAttributeIconSize 0
+
+class Student {
+    - studentId: String
+    + viewAvailability(): void
+    + bookRoom(room: Room, start: DateTime, end: DateTime): Booking
+    + cancelBooking(booking: Booking): void
+}
+
+class Administrator {
+    - adminId: String
+    + blockRoom(room: Room): void
+    + unblockRoom(room: Room): void
+    + reviewUsage(start: DateTime, end: DateTime): void
+}
+
+class Room {
+    - roomId: String
+    - isBlocked: Boolean
+    + isAvailable(start: DateTime, end: DateTime): Boolean
+    + block(): void
+    + unblock(): void
+}
+
+class Booking {
+    - bookingId: String
+    - startTime: DateTime
+    - endTime: DateTime
+    - status: BookingStatus
+    + isValid(): Boolean
+    + overlaps(other: Booking): Boolean
+    + confirm(): void
+    + cancel(): void
+}
+
+enum BookingStatus {
+    ACTIVE
+    CANCELLED
+}
+
+Student "1" -- "0..*" Booking : makes
+Room "1" -- "0..*" Booking : reserved for
+Administrator "0..*" -- "0..*" Room : blocks/unblocks
+Booking --> BookingStatus : status
+
+note right of Booking
+R1: start time must be in the future
+and duration must be > 0 and <= 2 hours.
+
+R2: active bookings for the same room
+must not overlap.
+
+R4: a successful booking produces
+a confirmation.
+end note
+
+note right of Room
+R3: a blocked room cannot be booked.
+end note
+
+@enduml
