@@ -36,50 +36,49 @@ be checked:
 
 ## 2. Prompt A — minimal
 
-**Prompt sent** (should be exactly one sentence):
+**Prompt sent:**
 
+```text
+Write Python code to analyze student marks.
 ```
 
-```
+**Assumptions the AI made that I never gave it:**
 
-**Assumptions the AI made that I never gave it** — list them, one per line. A data format, a pass
-threshold, a rounding rule, an input method, an invented feature all count.
-
-1.
-2.
-3.
+1. The default passing mark is 50.
+2. Marks must be numeric values between 0 and 100.
+3. Invalid marks should raise ValueError.
 
 **Questions it should have asked and did not:**
 
-1.
-2.
+1. What statistics should the function return?
+2. How should invalid input be handled?
 
-**Is the function named `analyze_marks` with the required signature?** yes / no — if no, what is it
-called:
+**Is the function named `analyze_marks` with the required signature?** Yes.
 
-**First impression before testing** (one sentence — you will compare this with section 6 later):
-
----
+**First impression before testing:** The generated solution was short and included validation, although the prompt did not specify detailed requirements.
 
 ## 3. Prompt B — structured context
 
-**Prompt sent** (paste it in full, including any substitutions):
+**Prompt ## 3. Prompt B — structured context
+
+**Prompt sent:**
 
 ```
-
+You are a Python developer. Implement analyze_marks(marks, pass_mark=50). Return
+average, highest, lowest, and pass_rate in a dictionary. Accept marks from 0 to 100;
+raise ValueError for an empty list, non-numeric values, or out-of-range values. Use
+no external libraries. Return code plus a short explanation.
 ```
 
 **What B fixed compared to A:**
 
-1.
-2.
+1. Prompt B explicitly specified the function signature and required dictionary keys, even though Prompt A already generated them correctly.
+2. Prompt B explicitly required ValueError for invalid inputs, reducing ambiguity in the requirements.
 
 **What B still leaves open:**
 
-1.
-2.
-
----
+1. Whether pass_rate must be rounded to two decimal places.
+2. Whether a mark equal to pass_mark counts as passing (the correct rule is greater than or equal to).
 
 ## 4. Prompt C — examples and tests
 
@@ -128,57 +127,112 @@ called:
 
 ## 6. Test results — the evidence
 
-Six cases × four prompts. Verdicts are **PASS**, **FAIL** or **ERROR** only.
+Six cases × four prompts. Verdicts are PASS, FAIL or ERROR only.
 
 | # | Call | Required | A | B | C | D |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1 | `analyze_marks([40, 60, 80], 50)` | avg 60 · high 80 · low 40 · rate 66.67 | | | | |
-| 2 | `analyze_marks([100], 50)` | avg 100 · high 100 · low 100 · rate 100 | | | | |
-| 3 | `analyze_marks([49.5, 50], 50)` | avg 49.75 · high 50 · low 49.5 · rate 50 | | | | |
-| 4 | `analyze_marks([], 50)` | raises ValueError | | | | |
-| 5 | `analyze_marks([40, "60"], 50)` | raises ValueError | | | | |
-| 6 | `analyze_marks([-1, 50, 101], 50)` | raises ValueError | | | | |
-| | **Totals** | | /6 | /6 | /6 | /6 |
+|---|---|---|---|---|---|---|
+| 1 | `analyze_marks([40, 60, 80], 50)` | avg 60, high 80, low 40, rate 66.67 | PASS | PASS | — | — |
+| 2 | `analyze_marks([100], 50)` | avg 100, high 100, low 100, rate 100 | PASS | PASS | — | — |
+| 3 | `analyze_marks([49.5, 50], 50)` | avg 49.75, high 50, low 49.5, rate 50 | PASS | PASS | — | — |
+| 4 | `analyze_marks([], 50)` | ValueError | PASS | PASS | — | — |
+| 5 | `analyze_marks([40, "60"], 50)` | ValueError | PASS | PASS | — | — |
+| 6 | `analyze_marks([-1, 50, 101], 50)` | ValueError | PASS | PASS | — | — |
+| | **Totals** | | **6/6** | **6/6** | — | — |
 
 **For every FAIL and ERROR above, one line: what was returned or raised instead.**
 
 | Prompt | Case | What actually happened |
-| --- | --- | --- |
-| | | |
-| | | |
-| | | |
+|---|---|---|
+| A | None | All six cases passed |
+| B | None | All six cases passed |
+| C | Not tested yet | — |
+| D | Not tested yet | — |
 
 ### Pasted terminal output — all four runs
 
-> This is the part that makes the table above count. Paste the **whole** output, unedited,
-> including the header lines. A table with nothing behind it is not accepted.
-
 **Prompt A**
 
-```
-
+```text
+{'average': 70.0, 'highest': 90, 'lowest': 45, 'pass_rate': 80.0}
+========================================================================
+analyze_marks harness — week-02/code/prompt_a.py
+tolerance for numeric comparison: 0.01
+========================================================================
+SIGNATURE: ok
+------------------------------------------------------------------------
+case 1  PASS   analyze_marks([40, 60, 80], 50)
+          expect: average=60.0, highest=80, lowest=40, pass_rate=66.67
+          got   : average=60.0, highest=80, lowest=40, pass_rate=66.66666666666666
+------------------------------------------------------------------------
+case 2  PASS   analyze_marks([100], 50)
+          expect: average=100.0, highest=100, lowest=100, pass_rate=100.0
+          got   : average=100.0, highest=100, lowest=100, pass_rate=100.0
+------------------------------------------------------------------------
+case 3  PASS   analyze_marks([49.5, 50], 50)
+          expect: average=49.75, highest=50, lowest=49.5, pass_rate=50.0
+          got   : average=49.75, highest=50, lowest=49.5, pass_rate=50.0
+------------------------------------------------------------------------
+case 4  PASS   analyze_marks([], 50)
+          expect: ValueError
+          got   : raised ValueError: Marks cannot be empty
+------------------------------------------------------------------------
+case 5  PASS   analyze_marks([40, '60'], 50)
+          expect: ValueError
+          got   : raised ValueError: Invalid mark
+------------------------------------------------------------------------
+case 6  PASS   analyze_marks([-1, 50, 101], 50)
+          expect: ValueError
+          got   : raised ValueError: Invalid mark
+------------------------------------------------------------------------
+RESULT  6 PASS · 0 FAIL · 0 ERROR   (week-02/code/prompt_a.py)
+========================================================================
 ```
 
 **Prompt B**
 
-```
-
+```text
+{'average': 66.0, 'highest': 90, 'lowest': 40, 'pass_rate': 80.0}
+========================================================================
+analyze_marks harness — week-02/code/prompt_b.py
+tolerance for numeric comparison: 0.01
+========================================================================
+SIGNATURE: ok
+------------------------------------------------------------------------
+case 1  PASS   analyze_marks([40, 60, 80], 50)
+          expect: average=60.0, highest=80, lowest=40, pass_rate=66.67
+          got   : average=60.0, highest=80, lowest=40, pass_rate=66.66666666666666
+------------------------------------------------------------------------
+case 2  PASS   analyze_marks([100], 50)
+          expect: average=100.0, highest=100, lowest=100, pass_rate=100.0
+          got   : average=100.0, highest=100, lowest=100, pass_rate=100.0
+------------------------------------------------------------------------
+case 3  PASS   analyze_marks([49.5, 50], 50)
+          expect: average=49.75, highest=50, lowest=49.5, pass_rate=50.0
+          got   : average=49.75, highest=50, lowest=49.5, pass_rate=50.0
+------------------------------------------------------------------------
+case 4  PASS   analyze_marks([], 50)
+          expect: ValueError
+          got   : raised ValueError: Marks must be a non-empty list
+------------------------------------------------------------------------
+case 5  PASS   analyze_marks([40, '60'], 50)
+          expect: ValueError
+          got   : raised ValueError: Marks must be numbers between 0 and 100
+------------------------------------------------------------------------
+case 6  PASS   analyze_marks([-1, 50, 101], 50)
+          expect: ValueError
+          got   : raised ValueError: Marks must be numbers between 0 and 100
+------------------------------------------------------------------------
+RESULT  6 PASS · 0 FAIL · 0 ERROR   (week-02/code/prompt_b.py)
+========================================================================
 ```
 
 **Prompt C**
 
-```
-
-```
+Not tested yet. Paste the complete actual terminal output here after running Prompt C.
 
 **Prompt D**
 
-```
-
-```
-
----
-
+Not tested yet. Paste the complete actual terminal output here after running Prompt D.
 ## 7. Scoring
 
 0–2 per criterion, using the rubric in `README.md` Part 7.
